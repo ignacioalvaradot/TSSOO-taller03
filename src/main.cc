@@ -53,9 +53,6 @@ int main(int argc, char **argv)
 
 	// LLENADO DEL ARREGLO DE FORMA SECUENCIAL
 	paralelo = new uint64_t[totalElementos];
-	std::random_device device;
-	std::mt19937 rng(device());
-	std::uniform_int_distribution<> unif(l_inferior, l_superior);
 	auto start1 = std::chrono::system_clock::now();
 	
 	fillArray(l_superior, l_inferior, 0, totalElementos);
@@ -85,6 +82,31 @@ int main(int argc, char **argv)
 	auto end = std::chrono::system_clock::now();
 	std::chrono::duration<float, std::milli> duration = end - start;
 	auto tiempo_arreglo = duration.count();
+	
+
+		// LLENADO DEL ARREGLO CON OPENMP
+	paralelo_openmp = new uint64_t[totalElementos];
+	std::random_device device;
+	std::mt19937 rng(device());
+	std::uniform_int_distribution<> unif(l_inferior, l_superior);
+	auto start3 = std::chrono::system_clock::now();
+	#pragma omp parallel for  num_threads(numThreads)
+	for(size_t i = 0; i < totalElementos; ++i){	
+		paralelo_openmp[i] = unif(rng);
+	}
+	
+	auto end3 = std::chrono::system_clock::now(); 
+	std::chrono::duration<float, std::milli> elapsed4 = end3 - start3;
+	auto totalTimeFill_OPENMP = elapsed4.count();
+
+
+
+		//SUMA SECUENCIAL
+	auto start2 = std::chrono::system_clock::now();
+	sum_secuencial(0, totalElementos);
+	auto end2 = std::chrono::system_clock::now(); 
+	std::chrono::duration<float, std::milli> elapsed2 = end2 - start2;
+	auto tiempo_suma_secuencial = elapsed2.count();
 
 		//SUMA EN PARALELO DEL ARREGLO OCUPANDO THREADS
 	sum_parciales = new uint64_t[totalElementos];
@@ -108,28 +130,6 @@ int main(int argc, char **argv)
 	end = std::chrono::system_clock::now();
 	std::chrono::duration<float, std::milli> duration6 = end - start;
 	auto tiempo_suma = duration6.count();
-	
-
-		// LLENADO DEL ARREGLO CON OPENMP
-	paralelo_openmp = new uint64_t[totalElementos];
-	auto start3 = std::chrono::system_clock::now();
-	#pragma omp parallel for  num_threads(numThreads)
-	for(size_t i = 0; i < totalElementos; ++i){	
-		paralelo_openmp[i] = unif(rng);
-	}
-	
-	auto end3 = std::chrono::system_clock::now(); 
-	std::chrono::duration<float, std::milli> elapsed4 = end3 - start3;
-	auto totalTimeFill_OPENMP = elapsed4.count();
-
-
-
-		//SUMA SECUENCIAL
-	auto start2 = std::chrono::system_clock::now();
-	sum_secuencial(0, totalElementos);
-	auto end2 = std::chrono::system_clock::now(); 
-	std::chrono::duration<float, std::milli> elapsed2 = end2 - start2;
-	auto tiempo_suma_secuencial = elapsed2.count();
 
 	//SUMA PARALELA CON OPENMP
 	uint64_t sum_openmp = 0;
