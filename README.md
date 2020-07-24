@@ -7,9 +7,9 @@
 En la siguiente figura se puede observar un diagrama de secuencia que explica el funcionamiento de los procesos que se ejecutarán para llegar a la solución del problema.
 ![Ialvarado](http://imgfz.com/i/3h680Hk.png)
 
-Para resolver el problema será necesario conocer el lenguaje de programación c ++ junto a las librerías que se encarguen de la implementación threads, como también los comandos para medir los tiempos de ejecución de las ejecuciones del programa los cuales serán necesarios para el posterior análisis de estos.
+Para resolver el problema será necesario conocer el lenguaje de programación c ++ junto a OpenMP que se encarga de la paralelización del problema, como también los comandos para medir los tiempos de ejecución de las ejecuciones del programa los cuales serán necesarios para el posterior análisis de estos.
 
-Una vez ejecutado el programa este debe comenzar a crear el arreglo vacío, con la cantidad de hilos y el total de elementos agregados en los parámetros al momento de la ejecución. Para crear los hilos por cada módulo, se van a añadir, con un ciclo For, los distintos segmentos de los hilos para luego unirlos. El llenado se debe hacer mediante el encargado de generar números aleatorios en base a los límites propuestos a la hora de ejecutar el programa. Tras realizar el llenado del arreglo, se debe ejecutar el módulo de suma del arreglo compuesto de la otra mitad de hilos instanciados.
+Una vez ejecutado el programa este debe comenzar a crear el arreglo vacío, con la cantidad de hilos y el total de elementos agregados en los parámetros al momento de la ejecución. Para la paralelización de los módulos se usarán funciones acorde a lo que pide cada módulo. El llenado se debe hacer mediante el encargado de generar números aleatorios en base a los límites propuestos a la hora de ejecutar el programa. Tras realizar el llenado del arreglo, se debe ejecutar el módulo de suma del arreglo
 ## 2. Estructura del Código
 
 ### 2.1 Parametros del script
@@ -33,24 +33,23 @@ argc = _argc;
 argv = _argv;
 }
 ```
-### 2.2 Modulo de llenado en paralelo
+### 2.2 Modulo de llenado en paralelo con OpenMP
 
- Para llenar el arreglo con números randomicos en los limites establecidos en los parámetros de entrada del programa, tenemos la siguiente función:
+ Para llenar el arreglo con números randomicos en los limites establecidos en los parámetros de entrada del programa, tenemos el siguiente codigo:
 
 ```
-void fillArray(uint32_t l_superior, uint32_t l_inferior, size_t beginIndex,
-size_t endIndex)
-{
-std::random_device device;
-std::mt19937 rng(device());
-std::uniform_int_distribution<> unif(l_inferior, l_superior);
-for (size_t i = beginIndex; i < endIndex; ++i){
-	paralelo[i] = unif(rng);
+paralelo_openmp = new uint64_t[totalElementos];
+	std::random_device device;
+	std::mt19937 rng(device());
+	std::uniform_int_distribution<> unif(l_inferior, l_superior);
+	#pragma omp parallel for  num_threads(numThreads)
+	for(size_t i = 0; i < totalElementos; ++i){	
+		paralelo_openmp[i] = unif(rng);
 	}
-}
+	
 ```
 
 
-### 2.3 Modulo de suma en paralelo.
+### 2.3 Modulo de suma en paralelo con OpenMP.
 
 
