@@ -33,9 +33,17 @@ argc = _argc;
 argv = _argv;
 }
 ```
-### 2.2 Modulo de llenado en paralelo con OpenMP
+### 2.2 Librerias
+En el archivo "global.hh" se encuentran las librerias que son usadas para el diseño de los modulos que seran explicados luego.
+```
+#include <chrono>
+#include <thread>
+#include <omp.h>
+```
+Estas tres librerías son las fundamentales para que el programa funcione correctamente, la librería `chrono` permite medir el tiempo para realizar estadísticas de los módulos, `thread` permite generar hilos para luego comparar los tiempos de ejecución con la API OpenMP, y por ultimo esta  `omp.h`  que provee las funcionalidades de OpenMP al código.
+### 2.3 Modulo de llenado en paralelo con OpenMP
 
- Para llenar el arreglo con números randomicos en los limites establecidos en los parámetros de entrada del programa, tenemos el siguiente codigo:
+ Para llenar el arreglo con números randomicos en los limites establecidos en los parámetros de entrada del programa con OpenMP, tenemos el siguiente codigo:
 
 ```
 paralelo_openmp = new uint64_t[totalElementos];
@@ -48,8 +56,15 @@ paralelo_openmp = new uint64_t[totalElementos];
 	}
 	
 ```
-
-
-### 2.3 Modulo de suma en paralelo con OpenMP.
-
+Se tiene  el arreglo `paralelo_openmp` el cual contiene los números que son generados de forma randomica, estos números tienen como argumento a los limites que son ingresados al ejecutar el programa (`l_inferior`, `l_superior`), y se tiene  la funcion `#pragma omp parallel` que permite que el código dentro de el se ejecute de forma paralela con los hilos indicados con la variable `numThreads` que es pasada por parámetro al momento de ejecución.
+### 2.4 Modulo de suma en paralelo con OpenMP.
+En este modulo se pide sumar todos los numeros almacenados en un arreglo de forma paralela usando OpenMP, esto de puede ver en el siguiente código:
+```
+uint64_t sum_openmp = 0;
+#pragma omp parallel for reduction(+:sum_openmp) num_threads(numThreads)
+for(size_t i = 0; i < totalElementos; ++i){
+	sum_openmp += paralelo[i];
+}
+```
+Se tiene la variable `sum_openmp` la que contiene la suma de los valores del arreglo llamado `paralelo`. Finalmente se tiene la clausula `reduction`  que divide de forma atómica la variable `sum_openmp` para asociarla a los hilos dados por `numthreads` y luego de eso el for que recorrerá el arreglo y sumar los valores de este en la variable ya mencionada.
 
